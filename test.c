@@ -9,8 +9,7 @@
 char user_names[MAX_USERS][30];
 int user_count = 0, current_user = -1;
 
-// 사용자별 날짜(연도, 월, 일), 차량 이동 거리[km], 전기 사용량[kWh], 가스 사용량[m³], 택배 이용 횟수
-// 일회용품 개수, 가스 사용량[m³], 택배 이용 횟수, 총 CO2 배출량[kg] 저장
+// 사용자별 날짜(연도, 월, 일), 차량 이동 거리[km], 전기 사용량[kWh], 일회용품 개수, 가스 사용량[m³], 택배 이용 횟수, 총 CO2 배출량[kg]
 int user_year[MAX_USERS][MAX_DAYS];
 int user_month[MAX_USERS][MAX_DAYS];
 int user_day[MAX_USERS][MAX_DAYS];

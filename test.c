@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <string.h> //문자열 처리 헤더
+#include <string.h>
 #include <time.h>
 
 #define MAX_DAYS 366
@@ -98,20 +98,39 @@ void input_data()
     day_count[current_user]++;
 }
 
+// 특정 월의 평균 탄소 배출량을 계산
+double get_monthly_avg(int user, int year, int month)
+{
+    double sum = 0;
+    int cnt = 0;
+    for (int j = 0; j < day_count[user]; j++)
+    {
+        if (user_year[user][j] == year && user_month[user][j] == month)
+        {
+            sum += total_co2[user][j];
+            cnt++;
+        }
+    }
+    return cnt ? sum / cnt : 0;
+}
+
 void show_graph()
 {
-    printf("\n======== 탄소 배출량 비교 그래프 ========\n");
+    int year, month;
+    printf("연도와 월을 입력하세요 (YYYY MM): ");
+    scanf("%d %d", &year, &month);
+    clear_input_buffer();
+
+    printf("\n======== %d년 %d월 월평균 탄소 배출량 그래프 ========\n", year, month);
     for (int i = 0; i < user_count; i++)
     {
-        double sum = 0;
-        for (int j = 0; j < day_count[i]; j++)
-            sum += total_co2[i][j];
-        int bar = (int)(sum / 2);
+        double avg = get_monthly_avg(i, year, month);
+        int bar = (int)(avg); // 평균값으로 막대 길이 결정 (단위: kg)
         printf("%-4s : ", user_names[i]);
         for (int k = 0; k < bar; k++) printf("■");
-        printf(" (%.1f kg)\n", sum);
+        printf(" (%.1f kg/일)\n", avg);
     }
-    printf("==============================================\n");
+    printf("=======================================================\n");
 }
 
 void compare_users()
@@ -180,11 +199,11 @@ void load_from_file()
 void menu()
 {
     printf("\n=== 탄소 발자국 프로그램 ===\n");
-    time_t now; //시간 값을 나타내기 위해 변수 now를 선언
-    struct tm* t; //tm 형태(연도, 월, 일, 시, 분, 초 등)의 포인터 변수 t를 선언
-    time(&now); //현재 시간을 구해서 변수 now에 저장
-    t = localtime(&now); //포인터 t에 초 단위 시간을 읽을 수 있는 형태로 변환 후 저장
-    printf("현재 날짜: %04d-%02d-%02d\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday); //tm_year는 1900년 이후 경과 년수, tm_mon는 0부터 시작하는 월
+    time_t now;
+    struct tm* t;
+    time(&now);
+    t = localtime(&now);
+    printf("현재 날짜: %04d-%02d-%02d\n", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday);
     printf("1. 로그인\n2. 입력\n3. 그래프\n4. 비교\n5. 파일에서 데이터 읽기\n6. 종료\n선택: ");
 }
 

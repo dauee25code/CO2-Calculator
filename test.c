@@ -236,13 +236,13 @@ void load_from_file() {
 }
 
 void menu() {
-    printf("\n=== 탄소 발자국 프로그램 ===\n");
-    time_t now;
-    struct tm* t;
-    time(&now);
-    t = localtime(&now);
+    printf("\n=== 탄소 발자국 프로그램 ===\n");Add commentMore actions
+    time_t now; //시간 값을 나타내기 위해 변수 now를 선언
+    struct tm* t; //tm 형태(연도, 월, 일, 시, 분, 초 등)의 포인터 변수 t를 선언
+    time(&now); //현재 시간을 구해서 변수 now에 저장
+    t = localtime(&now); //포인터 t에 초 단위 시간을 읽을 수 있는 형태로 변환 후 저장
     printf("현재 날짜: %04d-%02d-%02d\n",
-        t->tm_year + 1900, t->tm_mon + 1, t->tm_mday);
+        t->tm_year + 1900, t->tm_mon + 1, t->tm_mday); //tm_year는 1900년부터 경과한 연수, tm_mon는 0부터 시작하는 월
     printf("1. 로그인\n2. 입력\n3. 그래프\n4. 비교\n5. 파일에서 데이터 읽기\n6. 종료\n선택: ");
 }
 

@@ -1,14 +1,15 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <string.h>
-#include <time.h>
+#include <string.h>  // 문자열 처리를 위한 헤더
+#include <time.h>    // 현재 날짜 출력을 위한 헤더
 
-#define MAX_DAYS 366
-#define MAX_USERS 10
+#define MAX_DAYS 366 // 최대 1년치 데이터 저장 (윤년 고려)
+#define MAX_USERS 10 // 최대 사용자 수
 
-char user_names[MAX_USERS][30];
-int user_count = 0, current_user = -1;
+char user_names[MAX_USERS][30]; // 사용자 이름 저장 배열
+int user_count = 0, current_user = -1; // 사용자 수, 현재 로그인한 사용자 인덱스
 
+// 사용자별 날짜(연도, 월, 일), 차량 이동 거리[km], 전기 사용량[kWh], 일회용품 개수, 가스 사용량[m³], 택배 이용 횟수, 총 CO2 배출량[kg]
 int user_year[MAX_USERS][MAX_DAYS];
 int user_month[MAX_USERS][MAX_DAYS];
 int user_day[MAX_USERS][MAX_DAYS];
@@ -18,24 +19,28 @@ int plastic_cnt[MAX_USERS][MAX_DAYS];
 double gas_m3[MAX_USERS][MAX_DAYS];
 int delivery_cnt[MAX_USERS][MAX_DAYS];
 double total_co2[MAX_USERS][MAX_DAYS];
-int day_count[MAX_USERS];
+int day_count[MAX_USERS]; // 각 사용자별 데이터 개수
 
-const double C = 0.2;
-const double E = 0.424;
-const double D = 0.1;
-const double G = 2.3;
-const double P = 0.5;
+// CO₂ 배출 계수
+const double C = 0.2;    // 차량 이동 (kg CO2/km)
+const double E = 0.424;  // 전기 사용 (kg CO2/kWh)
+const double D = 0.1;    // 일회용품 (kg CO2/개)
+const double G = 2.3;    // 가스 사용 (kg CO2/m³)
+const double P = 0.5;    // 택배 이용 (kg CO2/회)
 
+// 입력 버퍼 비우기 함수
 void clear_input_buffer() {
     while (getchar() != '\n');
 }
 
+// 사용자 로그인 및 등록 함수
 void login_user() {
     printf("\n사용자 이름 입력: ");
     char name[30];
     scanf("%s", name);
     clear_input_buffer();
 
+    // 이미 등록된 사용자인지 확인
     for (int i = 0; i < user_count; i++) {
         if (strcmp(user_names[i], name) == 0) {
             current_user = i;
@@ -44,6 +49,7 @@ void login_user() {
         }
     }
 
+    // 최대 사용자 수를 초과하지 않도록 확인
     if (user_count < MAX_USERS) {
         strcpy(user_names[user_count], name);
         day_count[user_count] = 0;
@@ -55,6 +61,7 @@ void login_user() {
     }
 }
 
+// 로그인된 사용자의 데이터를 입력받는 함수
 void input_data() {
     if (current_user == -1) {
         printf("로그인 먼저 하세요.\n");
@@ -62,11 +69,13 @@ void input_data() {
     }
 
     int idx = day_count[current_user];
+    // 미래 날짜는 입력받지 않음(최대 데이터 개수 제한)
     if (idx >= MAX_DAYS) {
         printf("더 이상 데이터를 저장할 수 없습니다.\n");
         return;
     }
 
+    // 날짜 입력
     printf("날짜 입력(YYYY MM DD): ");
     scanf("%d %d %d",
         &user_year[current_user][idx],
@@ -74,6 +83,7 @@ void input_data() {
         &user_day[current_user][idx]);
     clear_input_buffer();
 
+    // 차량 이동거리, 전기 사용량, 일회용품 개수, 가스 사용량, 택배 이용 횟수 입력
     printf("차량 이동 거리(km): ");
     scanf("%lf", &car_km[current_user][idx]);
     clear_input_buffer();
@@ -94,6 +104,7 @@ void input_data() {
     scanf("%d", &delivery_cnt[current_user][idx]);
     clear_input_buffer();
 
+    // 총 CO₂ 배출량 계산
     total_co2[current_user][idx] =
         car_km[current_user][idx] * C +
         elec_kwh[current_user][idx] * E +
@@ -103,6 +114,7 @@ void input_data() {
 
     printf("오늘의 배출량: %.2f kg CO₂\n", total_co2[current_user][idx]);
 
+    // 조언 메시지
     if (car_km[current_user][idx] > 20.0)
         printf("→ 대중교통 이용을 늘리면 탄소 배출을 줄일 수 있습니다.\n");
     if (elec_kwh[current_user][idx] > 15.0)
@@ -117,6 +129,7 @@ void input_data() {
     day_count[current_user]++;
 }
 
+// 월평균 탄소 배출량 계산 함수
 double get_monthly_avg(int user, int year, int month) {
     double sum = 0;
     int cnt = 0;
@@ -129,6 +142,7 @@ double get_monthly_avg(int user, int year, int month) {
     return cnt ? sum / cnt : 0;
 }
 
+// 월평균 탄소 배출량을 막대 그래프화 하여 보여주는 함수
 void show_graph() {
     int year, month;
     printf("연도와 월을 입력하세요 (YYYY MM): ");
@@ -150,6 +164,7 @@ void show_graph() {
     printf("=======================================================\n");
 }
 
+// 사용자별 누적 및 평균 탄소 배출량을 비교하여 가장 적은 사람을 찾는 함수
 void compare_users() {
     printf("\n======== 탄소 배출 비교 ========\n");
     printf("이름   | 누적(kg) | 평균(kg)\n");
@@ -177,6 +192,7 @@ void compare_users() {
     getchar();
 }
 
+// 파일에서 데이터를 읽어서 저장하는 함수
 void load_from_file() {
     if (current_user == -1) {
         printf("로그인 먼저 하세요.\n");
@@ -204,6 +220,7 @@ void load_from_file() {
             printf("더 이상 데이터를 저장할 수 없습니다.\n");
             break;
         }
+        // 날짜, 차량 이동 거리, 전기 사용량, 일회용품 개수, 가스 사용량, 택배 이용 횟수 입력
         user_year[current_user][day_count[current_user]] = year;
         user_month[current_user][day_count[current_user]] = month;
         user_day[current_user][day_count[current_user]] = day;
@@ -221,15 +238,13 @@ void load_from_file() {
     printf("파일에서 데이터 입력 완료 (%d일)\n", day_count[current_user]);
 }
 
-// 여러 사용자의 연도별 월별 평균 탄소배출량 출력
+// 여러 사용자의 연도별 월별 평균 탄소배출량 출력 함수
 void show_yearly_monthly_avg_all(int year) {
-    printf("\n===== %d년 월별 평균 탄소 배출량 =====\n", year);
-    // 월 헤더 출력
+    printf("\n===================================== %d년 월별 평균 탄소 배출량 =====================================\n", year);
     printf("%-8s", "사용자");
     for (int month = 1; month <= 12; month++)
         printf("%6d월", month);
     printf("\n");
-
     for (int i = 0; i < user_count; i++) {
         printf("%-8s", user_names[i]);
         for (int month = 1; month <= 12; month++) {
@@ -246,9 +261,11 @@ void show_yearly_monthly_avg_all(int year) {
         }
         printf("\n");
     }
-    printf("=================================\n");
+    printf("========================================================================================================\n");
 }
 
+
+// 연도 입력 후 연도별 월별 평균 탄소배출량 출력 함수
 void yearly_monthly_avg() {
     int year;
     printf("연도를 입력하세요 (YYYY): ");
@@ -257,6 +274,7 @@ void yearly_monthly_avg() {
     show_yearly_monthly_avg_all(year);
 }
 
+// 메뉴 출력 함수
 void menu() {
     printf("\n=== 탄소 발자국 프로그램 ===\n");
     time_t now;
@@ -268,6 +286,7 @@ void menu() {
     printf("1. 로그인\n2. 입력\n3. 월평균 막대그래프\n4. 연도별 월별 평균\n5. 비교\n6. 파일에서 데이터 읽기\n7. 종료\n선택: ");
 }
 
+// 메인 함수
 int main() {
     int choice;
     while (1) {

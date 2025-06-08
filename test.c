@@ -236,7 +236,7 @@ void load_from_file() {
 }
 
 void menu() {
-    printf("\n=== 탄소 발자국 프로그램 ===\n");Add commentMore actions
+    printf("\n=== 탄소 발자국 프로그램 ===\n");
     time_t now; //시간 값을 나타내기 위해 변수 now를 선언
     struct tm* t; //tm 형태(연도, 월, 일, 시, 분, 초 등)의 포인터 변수 t를 선언
     time(&now); //현재 시간을 구해서 변수 now에 저장

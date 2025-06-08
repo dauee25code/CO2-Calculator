@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX_DAYS 28  // 최대 28일
-
 // 랜덤 정수 생성
 int random_int(int min, int max) {
     return min + rand() % (max - min + 1);
@@ -28,10 +26,7 @@ int main() {
 
     srand((unsigned int)time(NULL));
 
-    int days = random_int(5, MAX_DAYS);  // 5~28일 중 무작위
-
-    for (int i = 0; i < days; ++i) {
-        int day = random_int(1, 28);
+    for (int day = 1; day <= 28; ++day) {
         double km = random_double(0.0, 100.0);      // 차량 이동 거리
         double kwh = random_double(0.0, 50.0);      // 전기 사용량
         int plastic = random_int(0, 10);            // 일회용품 개수
@@ -46,6 +41,6 @@ int main() {
     }
 
     fclose(file);
-    printf("data.csv 파일에 %d일치 더미 데이터를 저장했습니다.\n", days);
+    printf("data.csv 파일에 28일치 더미 데이터를 저장했습니다.\n");
     return 0;
 }

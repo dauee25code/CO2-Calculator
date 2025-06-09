@@ -157,7 +157,17 @@ void show_graph() {
         }
         double avg = get_monthly_avg(i, year, month);
         int bar = (int)(avg);
-        printf("%-4s : ", user_names[i]);
+
+        // 친환경 등급 결정
+        char grade;
+        if (avg <= 5.5) grade = 'A';
+        else if (avg <= 10.0) grade = 'B';
+        else if (avg <= 15.0) grade = 'C';
+        else if (avg <= 25.0) grade = 'D';
+        else if (avg <= 40.0) grade = 'E';
+        else grade = 'F';
+
+        printf("%-4s [%c] : ", user_names[i], grade);
         for (int k = 0; k < bar; k++) printf("■");
         printf(" (%.1f kg/일)\n", avg);
     }
